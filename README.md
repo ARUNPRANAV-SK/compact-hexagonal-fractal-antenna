@@ -152,10 +152,20 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ---
 
-## Author Information
+## Project Team & Authors
 
-**Arun Pranav SK**
-- **Degree**: B.E Electronics and Communication Engineering
-- **Institution**: Dr. N.G.P Institute of Technology
-- **GitHub**: [@ARUNPRANAV-SK](https://github.com/ARUNPRANAV-SK)
-- **Email**: arunpranav.sk@gmail.com
+### Student Contributors
+- **Arun Pranav SK** (Reg No. 710723106012)
+  - **Role**: Lead RF Design & EM Simulation
+  - **GitHub**: [@ARUNPRANAV-SK](https://github.com/ARUNPRANAV-SK)
+  - **Email**: arunpranav.sk@gmail.com
+- **J K Dakshata** (Reg No. 710723106020)
+  - **Role**: Hardware Fabrication & RF Measurement Testing
+- **Devanand N** (Reg No. 710723106021)
+  - **Role**: Parametric Sweep Optimization & Analytical Logs
+
+### Faculty Advisors & Reviewers
+- **Dr. K. Sakthisudhan, M.E., Ph.D.** (Project Supervisor & Coordinator, Professor ECE)
+- **Dr. Chandrasekharan N, M.E., Ph.D.** (Professor & Head, Department of ECE)
+
+**Institution**: Department of Electronics and Communication Engineering, Dr. N.G.P Institute of Technology, Coimbatore, Tamil Nadu, India.
