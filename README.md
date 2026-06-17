@@ -1,5 +1,7 @@
 # Compact Hexagonal Fractal Patch Antenna for 2.4 GHz Wireless Communication Applications
 
+![Project Thumbnail](public/images/thumbnail.png)
+
 An engineering project showcasing the design, simulation, fabrication, and analysis of a Compact Hexagonal Fractal Patch Antenna operating at the 2.4 GHz ISM band. The project combines a hexagonal patch geometry with circular fractal slot elements to increase the electrical path length of current propagation, achieving size miniaturization while maintaining optimal impedance matching, gain, and radiation characteristics.
 
 This repository contains:
