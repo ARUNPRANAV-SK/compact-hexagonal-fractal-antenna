@@ -1,10 +1,11 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { ListFilter, Settings, Sliders } from "lucide-react";
 
 export default function DesignParameters() {
+  const [viewMode, setViewMode] = useState<"blueprint" | "fabricated">("blueprint");
   const parameters = [
     { name: "Operating Frequency", value: "2.4 GHz", note: "ISM Band (Wi-Fi, Bluetooth)" },
     { name: "Substrate Material", value: "FR4 Glass Epoxy", note: "Standard low-cost RF laminate" },
@@ -37,57 +38,109 @@ export default function DesignParameters() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
           {/* Left Column: Blueprint Schematic */}
           <div className="lg:col-span-5 flex flex-col items-center">
-            <div className="relative w-full aspect-square max-w-[360px] rounded-2xl border border-dashed border-cyan-500/30 bg-cyan-950/5 p-6 flex flex-col items-center justify-center">
+            {/* View Mode Switcher */}
+            <div className="flex gap-2 p-0.5 rounded-lg bg-slate-900 border border-slate-800 mb-6 text-[10px] font-semibold">
+              <button
+                onClick={() => setViewMode("blueprint")}
+                className={`px-3 py-1 rounded-md transition-all cursor-pointer ${
+                  viewMode === "blueprint"
+                    ? "bg-cyan-500/20 text-cyan-400 border border-cyan-400/20"
+                    : "text-slate-400 hover:text-slate-200"
+                }`}
+              >
+                CAD Blueprint
+              </button>
+              <button
+                onClick={() => setViewMode("fabricated")}
+                className={`px-3 py-1 rounded-md transition-all cursor-pointer ${
+                  viewMode === "fabricated"
+                    ? "bg-cyan-500/20 text-cyan-400 border border-cyan-400/20"
+                    : "text-slate-400 hover:text-slate-200"
+                }`}
+              >
+                Fabricated Prototype
+              </button>
+            </div>
+
+            <div className="relative w-full aspect-square max-w-[360px] rounded-2xl border border-dashed border-cyan-500/30 bg-cyan-950/5 p-6 flex flex-col items-center justify-center min-h-[300px]">
               {/* Technical guidelines/grid overlay */}
               <div className="absolute inset-0 bg-grid-pattern opacity-40 rounded-2xl pointer-events-none" />
               <div className="absolute top-4 left-4 text-[10px] font-mono text-cyan-400/60 tracking-wider">
-                GEOMETRIC SCHEMATIC
+                {viewMode === "blueprint" ? "GEOMETRIC SCHEMATIC" : "PHYSICAL HARDWARE"}
               </div>
 
-              {/* Antenna Vector blueprint */}
-              <svg width="220" height="220" viewBox="0 0 200 200" className="relative z-10">
-                {/* Horizontal reference axis */}
-                <line x1="10" y1="100" x2="190" y2="100" stroke="rgba(6, 182, 212, 0.2)" strokeWidth="0.5" strokeDasharray="3 3" />
-                {/* Vertical reference axis */}
-                <line x1="100" y1="10" x2="100" y2="190" stroke="rgba(6, 182, 212, 0.2)" strokeWidth="0.5" strokeDasharray="3 3" />
+              {viewMode === "blueprint" ? (
+                <>
+                  {/* Antenna Vector blueprint */}
+                  <svg width="220" height="220" viewBox="0 0 200 200" className="relative z-10">
+                    {/* Horizontal reference axis */}
+                    <line x1="10" y1="100" x2="190" y2="100" stroke="rgba(6, 182, 212, 0.2)" strokeWidth="0.5" strokeDasharray="3 3" />
+                    {/* Vertical reference axis */}
+                    <line x1="100" y1="10" x2="100" y2="190" stroke="rgba(6, 182, 212, 0.2)" strokeWidth="0.5" strokeDasharray="3 3" />
 
-                {/* Substrate boundary outer box (dotted) */}
-                <rect x="25" y="25" width="150" height="150" fill="none" stroke="rgba(6, 182, 212, 0.3)" strokeWidth="1" strokeDasharray="2 2" />
+                    {/* Substrate boundary outer box (dotted) */}
+                    <rect x="25" y="25" width="150" height="150" fill="none" stroke="rgba(6, 182, 212, 0.3)" strokeWidth="1" strokeDasharray="2 2" />
 
-                {/* Microstrip feed line */}
-                <rect x="94" y="125" width="12" height="50" fill="none" stroke="rgba(59, 130, 246, 0.8)" strokeWidth="1.5" />
-                
-                {/* Hexagonal Patch */}
-                <polygon
-                  points="100,45 140,68 140,113 100,135 60,113 60,68"
-                  fill="none"
-                  stroke="#22d3ee"
-                  strokeWidth="2"
-                />
+                    {/* Microstrip feed line */}
+                    <rect x="94" y="125" width="12" height="50" fill="none" stroke="rgba(59, 130, 246, 0.8)" strokeWidth="1.5" />
+                    
+                    {/* Hexagonal Patch */}
+                    <polygon
+                      points="100,45 140,68 140,113 100,135 60,113 60,68"
+                      fill="none"
+                      stroke="#22d3ee"
+                      strokeWidth="2"
+                    />
 
-                {/* Annotation lines & arrows */}
-                {/* Width dimension */}
-                <line x1="60" y1="35" x2="140" y2="35" stroke="rgba(255,255,255,0.4)" strokeWidth="1" />
-                <polygon points="60,35 65,32 65,38" fill="rgba(255,255,255,0.6)" />
-                <polygon points="140,35 135,32 135,38" fill="rgba(255,255,255,0.6)" />
-                <text x="100" y="28" fill="rgba(255,255,255,0.6)" fontSize="9" textAnchor="middle" fontFamily="monospace">W = 25 mm</text>
+                    {/* Annotation lines & arrows */}
+                    {/* Width dimension */}
+                    <line x1="60" y1="35" x2="140" y2="35" stroke="rgba(255,255,255,0.4)" strokeWidth="1" />
+                    <polygon points="60,35 65,32 65,38" fill="rgba(255,255,255,0.6)" />
+                    <polygon points="140,35 135,32 135,38" fill="rgba(255,255,255,0.6)" />
+                    <text x="100" y="28" fill="rgba(255,255,255,0.6)" fontSize="9" textAnchor="middle" fontFamily="monospace">W = 25 mm</text>
 
-                {/* Length dimension */}
-                <line x1="155" y1="45" x2="155" y2="135" stroke="rgba(255,255,255,0.4)" strokeWidth="1" />
-                <polygon points="155,45 152,50 158,50" fill="rgba(255,255,255,0.6)" />
-                <polygon points="155,135 152,130 158,130" fill="rgba(255,255,255,0.6)" />
-                <text x="163" y="93" fill="rgba(255,255,255,0.6)" fontSize="9" textAnchor="start" fontFamily="monospace">L = 28 mm</text>
+                    {/* Length dimension */}
+                    <line x1="155" y1="45" x2="155" y2="135" stroke="rgba(255,255,255,0.4)" strokeWidth="1" />
+                    <polygon points="155,45 152,50 158,50" fill="rgba(255,255,255,0.6)" />
+                    <polygon points="155,135 152,130 158,130" fill="rgba(255,255,255,0.6)" />
+                    <text x="163" y="93" fill="rgba(255,255,255,0.6)" fontSize="9" textAnchor="start" fontFamily="monospace">L = 28 mm</text>
 
-                {/* Center circle annotation */}
-                <circle cx="100" cy="90" r="15" fill="none" stroke="rgba(239, 68, 68, 0.7)" strokeWidth="1" />
-                <line x1="100" y1="90" x2="115" y2="75" stroke="rgba(239, 68, 68, 0.7)" strokeWidth="1" />
-                <text x="118" y="72" fill="rgba(239, 68, 68, 0.9)" fontSize="8" fontFamily="monospace">R1 (Slot)</text>
-              </svg>
+                    {/* Center circle annotation */}
+                    <circle cx="100" cy="90" r="15" fill="none" stroke="rgba(239, 68, 68, 0.7)" strokeWidth="1" />
+                    <line x1="100" y1="90" x2="115" y2="75" stroke="rgba(239, 68, 68, 0.7)" strokeWidth="1" />
+                    <text x="118" y="72" fill="rgba(239, 68, 68, 0.9)" fontSize="8" fontFamily="monospace">R1 (Slot)</text>
+                  </svg>
 
-              <div className="mt-4 flex flex-col items-center gap-1">
-                <span className="text-xs text-slate-300 font-medium">Dimension Blueprint</span>
-                <span className="text-[10px] text-slate-500 font-mono">Drawing scale: NTS (Not to Scale)</span>
-              </div>
+                  <div className="mt-4 flex flex-col items-center gap-1">
+                    <span className="text-xs text-slate-300 font-medium">Dimension Blueprint</span>
+                    <span className="text-[10px] text-slate-500 font-mono">Drawing scale: NTS (Not to Scale)</span>
+                  </div>
+                </>
+              ) : (
+                <div className="relative w-full h-full flex flex-col items-center justify-center gap-4">
+                  <div className="flex gap-4 items-center justify-center">
+                    <div className="flex flex-col items-center gap-1.5">
+                      <img
+                        src="/images/img_page_43_1.jpg"
+                        alt="Fabricated Front View"
+                        className="max-h-[140px] w-auto rounded-lg border border-slate-800 bg-slate-950/80 object-contain shadow-md"
+                      />
+                      <span className="text-[9px] font-mono text-cyan-400">Front View</span>
+                    </div>
+                    <div className="flex flex-col items-center gap-1.5">
+                      <img
+                        src="/images/img_page_43_2.jpg"
+                        alt="Fabricated Back View"
+                        className="max-h-[140px] w-auto rounded-lg border border-slate-800 bg-slate-950/80 object-contain shadow-md"
+                      />
+                      <span className="text-[9px] font-mono text-cyan-400">Back View</span>
+                    </div>
+                  </div>
+                  <div className="mt-2 text-[10px] font-mono text-slate-400 text-center max-w-xs leading-relaxed">
+                    Fig 4.6 Fabricated Double-Sided Prototype on FR4 Board
+                  </div>
+                </div>
+              )}
             </div>
           </div>
 

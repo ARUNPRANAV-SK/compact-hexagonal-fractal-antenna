@@ -9,6 +9,7 @@ type ActiveView = "s11" | "vswr" | "radiation";
 export default function Results() {
   const [activeView, setActiveView] = useState<ActiveView>("s11");
   const [hoverData, setHoverData] = useState<{ freq: string; val: string } | null>(null);
+  const [mode, setMode] = useState<"interactive" | "hfss">("interactive");
   const chartRef = useRef<SVGSVGElement | null>(null);
 
   // Return Loss S11 Data points (Frequency GHz vs S11 dB)
@@ -294,7 +295,7 @@ export default function Results() {
           <div className="lg:col-span-8">
             <div className="glass-card rounded-2xl border-slate-800 shadow-2xl p-6 h-full flex flex-col justify-between">
               {/* Header inside visualizer */}
-              <div className="flex items-center justify-between border-b border-slate-800/80 pb-4 mb-6">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-slate-800/80 pb-4 mb-4 gap-4">
                 <div>
                   <h3 className="font-bold text-white text-base">
                     {activeView === "s11" && "Reflection Coefficient S11 Plot"}
@@ -308,7 +309,7 @@ export default function Results() {
                   </p>
                 </div>
                 {/* Live hover coordinates display */}
-                {hoverData && (
+                {hoverData && mode === "interactive" && (
                   <div className="bg-slate-900 border border-cyan-500/30 px-3 py-1.5 rounded-lg text-right font-mono scale-90 sm:scale-100">
                     <span className="text-[9px] text-slate-500 block uppercase">Cursor Readout</span>
                     <span className="text-xs font-bold text-cyan-400">
@@ -318,184 +319,284 @@ export default function Results() {
                 )}
               </div>
 
-              {/* Chart Content Area */}
+              {/* Mode Switcher Tabs */}
+              <div className="flex gap-2 p-1 rounded-lg bg-slate-950/80 border border-slate-800 self-start mb-6 text-[11px] font-semibold">
+                <button
+                  onClick={() => setMode("interactive")}
+                  className={`px-3 py-1.5 rounded-md transition-all cursor-pointer ${
+                    mode === "interactive"
+                      ? "bg-cyan-950 text-cyan-400 border border-cyan-500/30 shadow-inner"
+                      : "text-slate-400 hover:text-slate-200 border border-transparent"
+                  }`}
+                >
+                  Interactive Data Analyzer
+                </button>
+                <button
+                  onClick={() => {
+                    setMode("hfss");
+                    setHoverData(null);
+                  }}
+                  className={`px-3 py-1.5 rounded-md transition-all cursor-pointer ${
+                    mode === "hfss"
+                      ? "bg-cyan-950 text-cyan-400 border border-cyan-500/30 shadow-inner"
+                      : "text-slate-400 hover:text-slate-200 border border-transparent"
+                  }`}
+                >
+                  HFSS Captured Plots
+                </button>
+              </div>
+
+              {/* Chart/Plot Content Area */}
               <div className="flex-1 flex items-center justify-center min-h-[300px]">
-                {activeView === "s11" && (
-                  <svg
-                    ref={chartRef}
-                    width="100%"
-                    height="100%"
-                    viewBox={`0 0 ${width} ${height}`}
-                    className="overflow-visible select-none"
-                    onMouseMove={handleMouseMove}
-                    onMouseLeave={() => setHoverData(null)}
-                  >
-                    {/* Background Grids */}
-                    <line x1={paddingX} y1={paddingY} x2={width - paddingX} y2={paddingY} stroke="#1e293b" strokeWidth="0.5" />
-                    <line x1={paddingX} y1={paddingY + (height - paddingY * 2) * 0.285} x2={width - paddingX} y2={paddingY + (height - paddingY * 2) * 0.285} stroke="#334155" strokeWidth="0.5" strokeDasharray="3 3" /> {/* -10dB Threshold */}
-                    <line x1={paddingX} y1={paddingY + (height - paddingY * 2) * 0.5} x2={width - paddingX} y2={paddingY + (height - paddingY * 2) * 0.5} stroke="#1e293b" strokeWidth="0.5" />
-                    <line x1={paddingX} y1={height - paddingY} x2={width - paddingX} y2={height - paddingY} stroke="#1e293b" strokeWidth="1" />
+                {mode === "interactive" ? (
+                  <>
+                    {activeView === "s11" && (
+                      <svg
+                        ref={chartRef}
+                        width="100%"
+                        height="100%"
+                        viewBox={`0 0 ${width} ${height}`}
+                        className="overflow-visible select-none"
+                        onMouseMove={handleMouseMove}
+                        onMouseLeave={() => setHoverData(null)}
+                      >
+                        {/* Background Grids */}
+                        <line x1={paddingX} y1={paddingY} x2={width - paddingX} y2={paddingY} stroke="#1e293b" strokeWidth="0.5" />
+                        <line x1={paddingX} y1={paddingY + (height - paddingY * 2) * 0.285} x2={width - paddingX} y2={paddingY + (height - paddingY * 2) * 0.285} stroke="#334155" strokeWidth="0.5" strokeDasharray="3 3" /> {/* -10dB Threshold */}
+                        <line x1={paddingX} y1={paddingY + (height - paddingY * 2) * 0.5} x2={width - paddingX} y2={paddingY + (height - paddingY * 2) * 0.5} stroke="#1e293b" strokeWidth="0.5" />
+                        <line x1={paddingX} y1={height - paddingY} x2={width - paddingX} y2={height - paddingY} stroke="#1e293b" strokeWidth="1" />
 
-                    {/* Verticals */}
-                    <line x1={paddingX} y1={paddingY} x2={paddingX} y2={height - paddingY} stroke="#1e293b" strokeWidth="1" />
-                    <line x1={paddingX + (width - paddingX * 2) * 0.5} y1={paddingY} x2={paddingX + (width - paddingX * 2) * 0.5} y2={height - paddingY} stroke="#334155" strokeWidth="0.5" strokeDasharray="3 3" /> {/* 2.4 GHz Line */}
-                    <line x1={width - paddingX} y1={paddingY} x2={width - paddingX} y2={height - paddingY} stroke="#1e293b" strokeWidth="0.5" />
+                        {/* Verticals */}
+                        <line x1={paddingX} y1={paddingY} x2={paddingX} y2={height - paddingY} stroke="#1e293b" strokeWidth="1" />
+                        <line x1={paddingX + (width - paddingX * 2) * 0.5} y1={paddingY} x2={paddingX + (width - paddingX * 2) * 0.5} y2={height - paddingY} stroke="#334155" strokeWidth="0.5" strokeDasharray="3 3" /> {/* 2.4 GHz Line */}
+                        <line x1={width - paddingX} y1={paddingY} x2={width - paddingX} y2={height - paddingY} stroke="#1e293b" strokeWidth="0.5" />
 
-                    {/* S11 Limit Label (-10dB) */}
-                    <text x={paddingX - 10} y={paddingY + (height - paddingY * 2) * 0.285 + 4} fill="#ef4444" fontSize="8" textAnchor="end" fontFamily="monospace">-10 dB</text>
-                    <line x1={paddingX} y1={paddingY + (height - paddingY * 2) * 0.285} x2={width - paddingX} y2={paddingY + (height - paddingY * 2) * 0.285} stroke="#ef4444" strokeWidth="0.75" strokeOpacity="0.4" />
+                        {/* S11 Limit Label (-10dB) */}
+                        <text x={paddingX - 10} y={paddingY + (height - paddingY * 2) * 0.285 + 4} fill="#ef4444" fontSize="8" textAnchor="end" fontFamily="monospace">-10 dB</text>
+                        <line x1={paddingX} y1={paddingY + (height - paddingY * 2) * 0.285} x2={width - paddingX} y2={paddingY + (height - paddingY * 2) * 0.285} stroke="#ef4444" strokeWidth="0.75" strokeOpacity="0.4" />
 
-                    {/* Axes Y-Labels */}
-                    <text x={paddingX - 10} y={paddingY + 3} fill="#94a3b8" fontSize="9" textAnchor="end" fontFamily="monospace">0 dB</text>
-                    <text x={paddingX - 10} y={paddingY + (height - paddingY * 2) * 0.5 + 3} fill="#94a3b8" fontSize="9" textAnchor="end" fontFamily="monospace">-17.5 dB</text>
-                    <text x={paddingX - 10} y={height - paddingY + 3} fill="#94a3b8" fontSize="9" textAnchor="end" fontFamily="monospace">-35 dB</text>
+                        {/* Axes Y-Labels */}
+                        <text x={paddingX - 10} y={paddingY + 3} fill="#94a3b8" fontSize="9" textAnchor="end" fontFamily="monospace">0 dB</text>
+                        <text x={paddingX - 10} y={paddingY + (height - paddingY * 2) * 0.5 + 3} fill="#94a3b8" fontSize="9" textAnchor="end" fontFamily="monospace">-17.5 dB</text>
+                        <text x={paddingX - 10} y={height - paddingY + 3} fill="#94a3b8" fontSize="9" textAnchor="end" fontFamily="monospace">-35 dB</text>
 
-                    {/* Axes X-Labels */}
-                    <text x={paddingX} y={height - paddingY + 18} fill="#94a3b8" fontSize="9" textAnchor="middle" fontFamily="monospace">2.0 GHz</text>
-                    <text x={paddingX + (width - paddingX * 2) * 0.5} y={height - paddingY + 18} fill="#22d3ee" fontSize="9" textAnchor="middle" fontFamily="monospace" fontWeight="bold">2.4 GHz</text>
-                    <text x={width - paddingX} y={height - paddingY + 18} fill="#94a3b8" fontSize="9" textAnchor="middle" fontFamily="monospace">2.8 GHz</text>
+                        {/* Axes X-Labels */}
+                        <text x={paddingX} y={height - paddingY + 18} fill="#94a3b8" fontSize="9" textAnchor="middle" fontFamily="monospace">2.0 GHz</text>
+                        <text x={paddingX + (width - paddingX * 2) * 0.5} y={height - paddingY + 18} fill="#22d3ee" fontSize="9" textAnchor="middle" fontFamily="monospace" fontWeight="bold">2.4 GHz</text>
+                        <text x={width - paddingX} y={height - paddingY + 18} fill="#94a3b8" fontSize="9" textAnchor="middle" fontFamily="monospace">2.8 GHz</text>
 
-                    {/* Plot curve */}
-                    <path
-                      d={s11Path}
-                      fill="none"
-                      stroke="url(#s11Gradient)"
-                      strokeWidth="2.5"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-
-                    {/* Highlight resonance dot */}
-                    {(() => {
-                      const { x, y } = getS11Coords(2.40, -28.52);
-                      return (
-                        <g>
-                          <circle cx={x} cy={y} r="5" fill="#22d3ee" className="animate-ping" />
-                          <circle cx={x} cy={y} r="4" fill="#06b6d4" stroke="#ffffff" strokeWidth="1" />
-                        </g>
-                      );
-                    })()}
-
-                    <defs>
-                      <linearGradient id="s11Gradient" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="0%" stopColor="#3b82f6" />
-                        <stop offset="60%" stopColor="#22d3ee" />
-                        <stop offset="100%" stopColor="#06b6d4" />
-                      </linearGradient>
-                    </defs>
-                  </svg>
-                )}
-
-                {activeView === "vswr" && (
-                  <svg
-                    ref={chartRef}
-                    width="100%"
-                    height="100%"
-                    viewBox={`0 0 ${width} ${height}`}
-                    className="overflow-visible select-none"
-                    onMouseMove={handleMouseMove}
-                    onMouseLeave={() => setHoverData(null)}
-                  >
-                    {/* Background Grids */}
-                    <line x1={paddingX} y1={paddingY} x2={width - paddingX} y2={paddingY} stroke="#1e293b" strokeWidth="0.5" />
-                    <line x1={paddingX} y1={paddingY + (height - paddingY * 2) * 0.75} x2={width - paddingX} y2={paddingY + (height - paddingY * 2) * 0.75} stroke="#ef4444" strokeWidth="0.75" strokeOpacity="0.4" /> {/* VSWR = 2.0 Threshold */}
-                    <line x1={paddingX} y1={height - paddingY} x2={width - paddingX} y2={height - paddingY} stroke="#1e293b" strokeWidth="1" />
-
-                    {/* Verticals */}
-                    <line x1={paddingX} y1={paddingY} x2={paddingX} y2={height - paddingY} stroke="#1e293b" strokeWidth="1" />
-                    <line x1={paddingX + (width - paddingX * 2) * 0.5} y1={paddingY} x2={paddingX + (width - paddingX * 2) * 0.5} y2={height - paddingY} stroke="#334155" strokeWidth="0.5" strokeDasharray="3 3" />
-                    <line x1={width - paddingX} y1={paddingY} x2={width - paddingX} y2={height - paddingY} stroke="#1e293b" strokeWidth="0.5" />
-
-                    {/* VSWR Threshold Label (2.0) */}
-                    <text x={paddingX - 10} y={paddingY + (height - paddingY * 2) * 0.75 + 4} fill="#ef4444" fontSize="8" textAnchor="end" fontFamily="monospace">VSWR 2.0</text>
-
-                    {/* Axes Y-Labels */}
-                    <text x={paddingX - 10} y={paddingY + 3} fill="#94a3b8" fontSize="9" textAnchor="end" fontFamily="monospace">5.0</text>
-                    <text x={paddingX - 10} y={paddingY + (height - paddingY * 2) * 0.5 + 3} fill="#94a3b8" fontSize="9" textAnchor="end" fontFamily="monospace">3.0</text>
-                    <text x={paddingX - 10} y={height - paddingY + 3} fill="#94a3b8" fontSize="9" textAnchor="end" fontFamily="monospace">1.0</text>
-
-                    {/* Axes X-Labels */}
-                    <text x={paddingX} y={height - paddingY + 18} fill="#94a3b8" fontSize="9" textAnchor="middle" fontFamily="monospace">2.0 GHz</text>
-                    <text x={paddingX + (width - paddingX * 2) * 0.5} y={height - paddingY + 18} fill="#3b82f6" fontSize="9" textAnchor="middle" fontFamily="monospace" fontWeight="bold">2.4 GHz</text>
-                    <text x={width - paddingX} y={height - paddingY + 18} fill="#94a3b8" fontSize="9" textAnchor="middle" fontFamily="monospace">2.8 GHz</text>
-
-                    {/* Plot curve */}
-                    <path
-                      d={vswrPath}
-                      fill="none"
-                      stroke="url(#vswrGradient)"
-                      strokeWidth="2.5"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-
-                    {/* Highlight resonance dot */}
-                    {(() => {
-                      const { x, y } = getVswrCoords(2.40, 1.15);
-                      return (
-                        <g>
-                          <circle cx={x} cy={y} r="5" fill="#3b82f6" className="animate-ping" />
-                          <circle cx={x} cy={y} r="4" fill="#3b82f6" stroke="#ffffff" strokeWidth="1" />
-                        </g>
-                      );
-                    })()}
-
-                    <defs>
-                      <linearGradient id="vswrGradient" x1="0" y1="1" x2="0" y2="0">
-                        <stop offset="0%" stopColor="#3b82f6" />
-                        <stop offset="100%" stopColor="#ec4899" />
-                      </linearGradient>
-                    </defs>
-                  </svg>
-                )}
-
-                {activeView === "radiation" && (
-                  <div className="grid grid-cols-2 gap-8 w-full max-w-lg">
-                    {/* E-Plane Pattern */}
-                    <div className="flex flex-col items-center">
-                      <svg width="150" height="150" viewBox="0 0 100 100" className="overflow-visible">
-                        {/* Polar Circles */}
-                        <circle cx="50" cy="50" r="45" fill="none" stroke="#1e293b" strokeWidth="0.5" />
-                        <circle cx="50" cy="50" r="30" fill="none" stroke="#1e293b" strokeWidth="0.5" strokeDasharray="2 2" />
-                        <circle cx="50" cy="50" r="15" fill="none" stroke="#1e293b" strokeWidth="0.5" />
-                        {/* Axes */}
-                        <line x1="5" y1="50" x2="95" y2="50" stroke="#1e293b" strokeWidth="0.5" />
-                        <line x1="50" y1="5" x2="50" y2="95" stroke="#1e293b" strokeWidth="0.5" />
-                        
-                        {/* E-Plane Pattern Path (Figure-8 shaped omni-like pattern) */}
+                        {/* Plot curve */}
                         <path
-                          d="M 50,5 C 80,12 85,50 50,95 C 15,50 20,12 50,5 Z"
-                          fill="rgba(6, 182, 212, 0.15)"
-                          stroke="#06b6d4"
-                          strokeWidth="1.5"
+                          d={s11Path}
+                          fill="none"
+                          stroke="url(#s11Gradient)"
+                          strokeWidth="2.5"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
                         />
+
+                        {/* Highlight resonance dot */}
+                        {(() => {
+                          const { x, y } = getS11Coords(2.40, -28.52);
+                          return (
+                            <g>
+                              <circle cx={x} cy={y} r="5" fill="#22d3ee" className="animate-ping" />
+                              <circle cx={x} cy={y} r="4" fill="#06b6d4" stroke="#ffffff" strokeWidth="1" />
+                            </g>
+                          );
+                        })()}
+
+                        <defs>
+                          <linearGradient id="s11Gradient" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="0%" stopColor="#3b82f6" />
+                            <stop offset="60%" stopColor="#22d3ee" />
+                            <stop offset="100%" stopColor="#06b6d4" />
+                          </linearGradient>
+                        </defs>
                       </svg>
-                      <span className="text-xs font-mono font-bold text-cyan-400 mt-3">E-Plane (Elevation)</span>
-                    </div>
+                    )}
 
-                    {/* H-Plane Pattern */}
-                    <div className="flex flex-col items-center">
-                      <svg width="150" height="150" viewBox="0 0 100 100" className="overflow-visible">
-                        {/* Polar Circles */}
-                        <circle cx="50" cy="50" r="45" fill="none" stroke="#1e293b" strokeWidth="0.5" />
-                        <circle cx="50" cy="50" r="30" fill="none" stroke="#1e293b" strokeWidth="0.5" strokeDasharray="2 2" />
-                        <circle cx="50" cy="50" r="15" fill="none" stroke="#1e293b" strokeWidth="0.5" />
-                        {/* Axes */}
-                        <line x1="5" y1="50" x2="95" y2="50" stroke="#1e293b" strokeWidth="0.5" />
-                        <line x1="50" y1="5" x2="50" y2="95" stroke="#1e293b" strokeWidth="0.5" />
+                    {activeView === "vswr" && (
+                      <svg
+                        ref={chartRef}
+                        width="100%"
+                        height="100%"
+                        viewBox={`0 0 ${width} ${height}`}
+                        className="overflow-visible select-none"
+                        onMouseMove={handleMouseMove}
+                        onMouseLeave={() => setHoverData(null)}
+                      >
+                        {/* Background Grids */}
+                        <line x1={paddingX} y1={paddingY} x2={width - paddingX} y2={paddingY} stroke="#1e293b" strokeWidth="0.5" />
+                        <line x1={paddingX} y1={paddingY + (height - paddingY * 2) * 0.75} x2={width - paddingX} y2={paddingY + (height - paddingY * 2) * 0.75} stroke="#ef4444" strokeWidth="0.75" strokeOpacity="0.4" /> {/* VSWR = 2.0 Threshold */}
+                        <line x1={paddingX} y1={height - paddingY} x2={width - paddingX} y2={height - paddingY} stroke="#1e293b" strokeWidth="1" />
 
-                        {/* H-Plane Pattern Path (Omnidirectional circular pattern) */}
-                        <circle
-                          cx="50"
-                          cy="50"
-                          r="38"
-                          fill="rgba(59, 130, 246, 0.15)"
-                          stroke="#3b82f6"
-                          strokeWidth="1.5"
+                        {/* Verticals */}
+                        <line x1={paddingX} y1={paddingY} x2={paddingX} y2={height - paddingY} stroke="#1e293b" strokeWidth="1" />
+                        <line x1={paddingX + (width - paddingX * 2) * 0.5} y1={paddingY} x2={paddingX + (width - paddingX * 2) * 0.5} y2={height - paddingY} stroke="#334155" strokeWidth="0.5" strokeDasharray="3 3" />
+                        <line x1={width - paddingX} y1={paddingY} x2={width - paddingX} y2={height - paddingY} stroke="#1e293b" strokeWidth="0.5" />
+
+                        {/* VSWR Threshold Label (2.0) */}
+                        <text x={paddingX - 10} y={paddingY + (height - paddingY * 2) * 0.75 + 4} fill="#ef4444" fontSize="8" textAnchor="end" fontFamily="monospace">VSWR 2.0</text>
+
+                        {/* Axes Y-Labels */}
+                        <text x={paddingX - 10} y={paddingY + 3} fill="#94a3b8" fontSize="9" textAnchor="end" fontFamily="monospace">5.0</text>
+                        <text x={paddingX - 10} y={paddingY + (height - paddingY * 2) * 0.5 + 3} fill="#94a3b8" fontSize="9" textAnchor="end" fontFamily="monospace">3.0</text>
+                        <text x={paddingX - 10} y={height - paddingY + 3} fill="#94a3b8" fontSize="9" textAnchor="end" fontFamily="monospace">1.0</text>
+
+                        {/* Axes X-Labels */}
+                        <text x={paddingX} y={height - paddingY + 18} fill="#94a3b8" fontSize="9" textAnchor="middle" fontFamily="monospace">2.0 GHz</text>
+                        <text x={paddingX + (width - paddingX * 2) * 0.5} y={height - paddingY + 18} fill="#3b82f6" fontSize="9" textAnchor="middle" fontFamily="monospace" fontWeight="bold">2.4 GHz</text>
+                        <text x={width - paddingX} y={height - paddingY + 18} fill="#94a3b8" fontSize="9" textAnchor="middle" fontFamily="monospace">2.8 GHz</text>
+
+                        {/* Plot curve */}
+                        <path
+                          d={vswrPath}
+                          fill="none"
+                          stroke="url(#vswrGradient)"
+                          strokeWidth="2.5"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
                         />
+
+                        {/* Highlight resonance dot */}
+                        {(() => {
+                          const { x, y } = getVswrCoords(2.40, 1.15);
+                          return (
+                            <g>
+                              <circle cx={x} cy={y} r="5" fill="#3b82f6" className="animate-ping" />
+                              <circle cx={x} cy={y} r="4" fill="#3b82f6" stroke="#ffffff" strokeWidth="1" />
+                            </g>
+                          );
+                        })()}
+
+                        <defs>
+                          <linearGradient id="vswrGradient" x1="0" y1="1" x2="0" y2="0">
+                            <stop offset="0%" stopColor="#3b82f6" />
+                            <stop offset="100%" stopColor="#ec4899" />
+                          </linearGradient>
+                        </defs>
                       </svg>
-                      <span className="text-xs font-mono font-bold text-blue-400 mt-3">H-Plane (Azimuth)</span>
-                    </div>
+                    )}
+
+                    {activeView === "radiation" && (
+                      <div className="grid grid-cols-2 gap-8 w-full max-w-lg">
+                        {/* E-Plane Pattern */}
+                        <div className="flex flex-col items-center">
+                          <svg width="150" height="150" viewBox="0 0 100 100" className="overflow-visible">
+                            {/* Polar Circles */}
+                            <circle cx="50" cy="50" r="45" fill="none" stroke="#1e293b" strokeWidth="0.5" />
+                            <circle cx="50" cy="50" r="30" fill="none" stroke="#1e293b" strokeWidth="0.5" strokeDasharray="2 2" />
+                            <circle cx="50" cy="50" r="15" fill="none" stroke="#1e293b" strokeWidth="0.5" />
+                            {/* Axes */}
+                            <line x1="5" y1="50" x2="95" y2="50" stroke="#1e293b" strokeWidth="0.5" />
+                            <line x1="50" y1="5" x2="50" y2="95" stroke="#1e293b" strokeWidth="0.5" />
+                            
+                            {/* E-Plane Pattern Path (Figure-8 shaped omni-like pattern) */}
+                            <path
+                              d="M 50,5 C 80,12 85,50 50,95 C 15,50 20,12 50,5 Z"
+                              fill="rgba(6, 182, 212, 0.15)"
+                              stroke="#06b6d4"
+                              strokeWidth="1.5"
+                            />
+                          </svg>
+                          <span className="text-xs font-mono font-bold text-cyan-400 mt-3">E-Plane (Elevation)</span>
+                        </div>
+
+                        {/* H-Plane Pattern */}
+                        <div className="flex flex-col items-center">
+                          <svg width="150" height="150" viewBox="0 0 100 100" className="overflow-visible">
+                            {/* Polar Circles */}
+                            <circle cx="50" cy="50" r="45" fill="none" stroke="#1e293b" strokeWidth="0.5" />
+                            <circle cx="50" cy="50" r="30" fill="none" stroke="#1e293b" strokeWidth="0.5" strokeDasharray="2 2" />
+                            <circle cx="50" cy="50" r="15" fill="none" stroke="#1e293b" strokeWidth="0.5" />
+                            {/* Axes */}
+                            <line x1="5" y1="50" x2="95" y2="50" stroke="#1e293b" strokeWidth="0.5" />
+                            <line x1="50" y1="5" x2="50" y2="95" stroke="#1e293b" strokeWidth="0.5" />
+
+                            {/* H-Plane Pattern Path (Omnidirectional circular pattern) */}
+                            <circle
+                              cx="50"
+                              cy="50"
+                              r="38"
+                              fill="rgba(59, 130, 246, 0.15)"
+                              stroke="#3b82f6"
+                              strokeWidth="1.5"
+                            />
+                          </svg>
+                          <span className="text-xs font-mono font-bold text-blue-400 mt-3">H-Plane (Azimuth)</span>
+                        </div>
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  <div className="w-full h-full flex flex-col items-center justify-center p-2">
+                    {activeView === "s11" && (
+                      <div className="flex flex-col items-center max-w-md w-full">
+                        <img
+                          src="/images/img_page_48_1.png"
+                          alt="Simulated Return Loss S11 Plot"
+                          className="max-h-[200px] sm:max-h-[220px] w-auto rounded-lg border border-slate-800 shadow bg-slate-950/85 object-contain"
+                        />
+                        <span className="text-[10px] font-mono text-cyan-400 mt-4 bg-slate-950 border border-slate-800 px-3 py-1 rounded">
+                          Fig 5.1 Re-simulated Return Loss S11 Curve
+                        </span>
+                      </div>
+                    )}
+
+                    {activeView === "vswr" && (
+                      <div className="flex flex-col items-center max-w-md w-full">
+                        <img
+                          src="/images/img_page_49_1.png"
+                          alt="Simulated VSWR Plot"
+                          className="max-h-[200px] sm:max-h-[220px] w-auto rounded-lg border border-slate-800 shadow bg-slate-950/85 object-contain"
+                        />
+                        <span className="text-[10px] font-mono text-cyan-400 mt-4 bg-slate-950 border border-slate-800 px-3 py-1 rounded">
+                          Fig 5.2 HFSS Simulated VSWR Plot
+                        </span>
+                      </div>
+                    )}
+
+                    {activeView === "radiation" && (
+                      <div className="flex flex-col items-center w-full">
+                        <div className="grid grid-cols-2 gap-4 w-full max-w-md">
+                          <div className="flex flex-col items-center">
+                            <img
+                              src="/images/img_page_50_1.png"
+                              alt="Captured E-Plane Radiation Pattern"
+                              className="max-h-[120px] w-auto rounded-lg border border-slate-800 bg-slate-950/80 object-contain"
+                            />
+                            <span className="text-[9px] font-mono text-cyan-400 mt-2">Fig 5.3 E-Plane 2D Pattern</span>
+                          </div>
+                          <div className="flex flex-col items-center">
+                            <img
+                              src="/images/img_page_51_1.png"
+                              alt="Captured H-Plane Radiation Pattern"
+                              className="max-h-[120px] w-auto rounded-lg border border-slate-800 bg-slate-950/80 object-contain"
+                            />
+                            <span className="text-[9px] font-mono text-blue-400 mt-2">Fig 5.5 H-Plane 2D Pattern</span>
+                          </div>
+                        </div>
+                        <div className="grid grid-cols-2 gap-4 w-full max-w-md mt-4 border-t border-slate-900 pt-3">
+                          <div className="flex flex-col items-center">
+                            <img
+                              src="/images/img_page_50_2.png"
+                              alt="Captured E-Plane Gain Plot"
+                              className="max-h-[50px] w-auto rounded-lg border border-slate-800 bg-slate-950/80 object-contain"
+                            />
+                            <span className="text-[8px] font-mono text-slate-500 mt-1">E-Plane Gain Sweep</span>
+                          </div>
+                          <div className="flex flex-col items-center">
+                            <img
+                              src="/images/img_page_51_2.png"
+                              alt="Captured H-Plane 3D Polar Plot"
+                              className="max-h-[50px] w-auto rounded-lg border border-slate-800 bg-slate-950/80 object-contain"
+                            />
+                            <span className="text-[8px] font-mono text-slate-500 mt-1">3D Polar Pattern</span>
+                          </div>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>

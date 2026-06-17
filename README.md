@@ -114,14 +114,35 @@ Make sure you have [Node.js](https://nodejs.org/) installed (v18.0.0 or higher r
 
 ---
 
-## Screenshots Section
+## Screenshots & Simulation Results
 
-> [!NOTE]
-> Add simulation plots, CAD models, and photos of the fabricated antenna below:
+### Fabricated Prototype
+Double-sided board fabricated on standard FR4 substrate:
+<p align="center">
+  <img src="public/images/img_page_43_1.jpg" width="45%" alt="Fabricated Antenna Front" />
+  <img src="public/images/img_page_43_2.jpg" width="45%" alt="Fabricated Antenna Back" />
+</p>
 
-*(Placeholder for Fabricated Antenna Photo)*
-*(Placeholder for HFSS 3D Model)*
-*(Placeholder for Return Loss S11 Curve)*
+### HFSS 3D Simulation Design
+<p align="center">
+  <img src="public/images/img_page_42_1.png" width="80%" alt="HFSS 3D Model Design" />
+</p>
+
+### S11 Return Loss (Reflection Coefficient)
+<p align="center">
+  <img src="public/images/img_page_48_1.png" width="80%" alt="S11 Return Loss Parameter" />
+</p>
+
+### VSWR Plot
+<p align="center">
+  <img src="public/images/img_page_49_1.png" width="80%" alt="VSWR Plot Parameter" />
+</p>
+
+### 2D Radiation Patterns (E-Plane & H-Plane)
+<p align="center">
+  <img src="public/images/img_page_50_1.png" width="45%" alt="E-Plane 2D Radiation Pattern" />
+  <img src="public/images/img_page_51_1.png" width="45%" alt="H-Plane 2D Radiation Pattern" />
+</p>
 
 ---
 
